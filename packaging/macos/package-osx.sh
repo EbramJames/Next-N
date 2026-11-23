@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Next N — macOS .app Bundle & .dmg Installer Packager
+# Next N — macOS .app Bundle, .dmg Installer & .zip Archive Packager
+# Works natively on macOS (create-dmg / hdiutil) AND cross-platform on Linux
+# (xorriso HFS+ + libdmg-hfsplus UDZO + rcodesign ad-hoc signing).
 # Usage: ./packaging/macos/package-osx.sh <arm64|x64> <publish-dir> <version>
 # ============================================================================
 set -euo pipefail
@@ -40,10 +42,10 @@ MACOS_DIR="$APP_DIR/Contents/MacOS"
 RES_DIR="$APP_DIR/Contents/Resources"
 mkdir -p "$MACOS_DIR/bin/xray" "$MACOS_DIR/bin/sing_box" "$MACOS_DIR/bin/srss" "$RES_DIR"
 
-echo "[1/4] Staging Next N desktop binaries..."
+echo "[1/5] Staging Next N macOS desktop binaries ($OUT_ARCH)..."
 cp -a "$PUBLISH_DIR/." "$MACOS_DIR/"
-chmod +x "$MACOS_DIR/NextN"
-[[ -f "$MACOS_DIR/NextN.Updater" ]] && chmod +x "$MACOS_DIR/NextN.Updater" || true
+chmod 0755 "$MACOS_DIR/NextN"
+[[ -f "$MACOS_DIR/NextN.Updater" ]] && chmod 0755 "$MACOS_DIR/NextN.Updater" || true
 echo "Installed by Next N macOS Bundle. User data is stored in Application Support." > "$MACOS_DIR/NotStoreConfigHere.txt"
 
 if [[ -f "$MACOS_DIR/NextN.icns" ]]; then
@@ -52,7 +54,7 @@ elif [[ -f "$REPO_ROOT/src/NextN.Desktop/NextN.icns" ]]; then
   cp -f "$REPO_ROOT/src/NextN.Desktop/NextN.icns" "$RES_DIR/AppIcon.icns"
 fi
 
-echo "[2/4] Downloading official Xray-core, sing-box, and Geo assets..."
+echo "[2/5] Downloading official Xray-core, sing-box, and Geo assets..."
 gh_api() {
   if [[ -n "${GITHUB_TOKEN:-}" ]]; then
     curl -fsSL --retry 4 --retry-delay 2 -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "User-Agent: NextN-Packager" "$1"
@@ -67,14 +69,14 @@ fetch_file() {
 XRAY_TAG="$(gh_api https://api.github.com/repos/XTLS/Xray-core/releases/latest | jq -re '.tag_name')"
 fetch_file "https://github.com/XTLS/Xray-core/releases/download/${XRAY_TAG}/${XRAY_ASSET}" "$WORKDIR/xray.zip"
 unzip -q "$WORKDIR/xray.zip" -d "$WORKDIR/xray"
-install -m 755 "$WORKDIR/xray/xray" "$MACOS_DIR/bin/xray/xray"
+install -m 0755 "$WORKDIR/xray/xray" "$MACOS_DIR/bin/xray/xray"
 
 SING_TAG="$(gh_api https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -re '.tag_name')"
 SING_VER="${SING_TAG#v}"
 fetch_file "https://github.com/SagerNet/sing-box/releases/download/${SING_TAG}/sing-box-${SING_VER}-darwin-${SING_ARCH}.tar.gz" "$WORKDIR/singbox.tar.gz"
 tar -C "$WORKDIR" -xzf "$WORKDIR/singbox.tar.gz"
 SING_BIN="$(find "$WORKDIR" -type f -name 'sing-box' | head -n1)"
-install -m 755 "$SING_BIN" "$MACOS_DIR/bin/sing_box/sing-box"
+install -m 0755 "$SING_BIN" "$MACOS_DIR/bin/sing_box/sing-box"
 
 fetch_file "https://github.com/Loyalsoldier/V2ray-rules-dat/releases/latest/download/geosite.dat" "$MACOS_DIR/bin/geosite.dat"
 fetch_file "https://github.com/Loyalsoldier/V2ray-rules-dat/releases/latest/download/geoip.dat" "$MACOS_DIR/bin/geoip.dat"
@@ -89,7 +91,7 @@ for f in geosite-cn.srs geosite-gfw.srs geosite-google.srs geosite-greatfire.srs
   fetch_file "https://raw.githubusercontent.com/2dust/sing-box-rules/refs/heads/rule-set-geosite/$f" "$MACOS_DIR/bin/srss/$f"
 done
 
-echo "[3/4] Writing Info.plist..."
+echo "[3/5] Writing Info.plist and ad-hoc signing macOS binaries..."
 cat > "$APP_DIR/Contents/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -137,34 +139,84 @@ cat > "$APP_DIR/Contents/Info.plist" <<EOF
 </plist>
 EOF
 
-echo "[4/4] Creating macOS DMG installer..."
+HOST_OS="$(uname -s)"
+if [[ "$HOST_OS" == "Darwin" ]]; then
+  codesign --force --deep --sign - "$APP_DIR"
+elif command -v rcodesign >/dev/null 2>&1; then
+  echo "  Ad-hoc signing Mach-O executables and .dylibs via rcodesign..."
+  # Sign individual Mach-O binaries (required on Apple Silicon after cross-publish)
+  rcodesign sign "$MACOS_DIR/NextN"
+  [[ -f "$MACOS_DIR/NextN.Updater" ]] && rcodesign sign "$MACOS_DIR/NextN.Updater" || true
+  rcodesign sign "$MACOS_DIR/bin/xray/xray"
+  rcodesign sign "$MACOS_DIR/bin/sing_box/sing-box"
+  while IFS= read -r -d '' dylib; do
+    rcodesign sign "$dylib"
+  done < <(find "$MACOS_DIR" -type f -name '*.dylib' -print0)
+  echo "  Ad-hoc signing completed."
+fi
+
+echo "[4/5] Building macOS .zip archive (for direct install & in-app updater)..."
+ZIP_OUT="$DIST_DIR/NextN-macos-${OUT_ARCH}.zip"
+rm -f "$ZIP_OUT"
+(cd "$WORKDIR" && zip -qry "$ZIP_OUT" "Next N.app")
+echo "  Built: $ZIP_OUT"
+
+echo "[5/5] Building macOS .dmg installer..."
 DMG_OUT="$DIST_DIR/NextN-macos-${OUT_ARCH}.dmg"
 rm -f "$DMG_OUT"
 
-if command -v create-dmg >/dev/null 2>&1; then
-  create-dmg \
-    --volname "Next N Installer" \
-    --window-size 680 420 \
-    --icon-size 100 \
-    --icon "Next N.app" 175 185 \
-    --hide-extension "Next N.app" \
-    --app-drop-link 505 185 \
-    --skip-jenkins \
-    "$DMG_OUT" \
-    "$APP_DIR" || {
-      echo "create-dmg failed on headless runner; falling back to hdiutil..."
-      DMG_STAGE="$WORKDIR/dmg-stage"
-      mkdir -p "$DMG_STAGE"
-      cp -a "$APP_DIR" "$DMG_STAGE/"
-      ln -sf /Applications "$DMG_STAGE/Applications"
-      hdiutil create -volname "Next N Installer" -srcfolder "$DMG_STAGE" -ov -format UDZO "$DMG_OUT"
-    }
+DMG_STAGE="$WORKDIR/dmg-stage"
+mkdir -p "$DMG_STAGE"
+cp -a "$APP_DIR" "$DMG_STAGE/"
+ln -s /Applications "$DMG_STAGE/Applications"
+
+if [[ "$HOST_OS" == "Darwin" ]]; then
+  if command -v create-dmg >/dev/null 2>&1; then
+    create-dmg \
+      --volname "Next N Installer" \
+      --window-size 680 420 \
+      --icon-size 100 \
+      --icon "Next N.app" 175 185 \
+      --hide-extension "Next N.app" \
+      --app-drop-link 505 185 \
+      --skip-jenkins \
+      "$DMG_OUT" \
+      "$APP_DIR" || {
+        echo "create-dmg failed on headless runner; falling back to hdiutil..."
+        hdiutil create -volname "Next N Installer" -srcfolder "$DMG_STAGE" -ov -format UDZO "$DMG_OUT"
+      }
+  else
+    hdiutil create -volname "Next N Installer" -srcfolder "$DMG_STAGE" -ov -format UDZO "$DMG_OUT"
+  fi
 else
-  DMG_STAGE="$WORKDIR/dmg-stage"
-  mkdir -p "$DMG_STAGE"
-  cp -a "$APP_DIR" "$DMG_STAGE/"
-  ln -sf /Applications "$DMG_STAGE/Applications"
-  hdiutil create -volname "Next N Installer" -srcfolder "$DMG_STAGE" -ov -format UDZO "$DMG_OUT"
+  # Cross-platform Linux DMG builder: HFS+ hybrid image via xorriso + UDZO compression via libdmg-hfsplus (dmg)
+  if ! command -v xorriso >/dev/null 2>&1; then
+    echo "ERROR: xorriso is required on Linux to generate HFS+ macOS images." >&2
+    exit 1
+  fi
+  if ! command -v dmg >/dev/null 2>&1; then
+    echo "ERROR: 'dmg' (from libdmg-hfsplus) is required on Linux to generate compressed UDZO .dmg files." >&2
+    exit 1
+  fi
+
+  RAW_ISO="$WORKDIR/NextN-macos-${OUT_ARCH}-uncompressed.iso"
+  xorriso -as mkisofs \
+    -V "Next N Installer" \
+    -D -R -no-pad \
+    -hfsplus \
+    -o "$RAW_ISO" \
+    "$DMG_STAGE"
+
+  dmg "$RAW_ISO" "$DMG_OUT"
+
+  # Verify Apple UDIF 'koly' signature at the last 512 bytes of the DMG
+  MAGIC="$(tail -c 512 "$DMG_OUT" | head -c 4)"
+  if [[ "$MAGIC" != "koly" ]]; then
+    echo "ERROR: Generated DMG failed UDIF koly trailer verification (got '$MAGIC')." >&2
+    exit 1
+  fi
+  echo "  Verified Apple UDIF 'koly' trailer on $DMG_OUT"
 fi
 
-echo "[OK] macOS installer built: $DMG_OUT"
+ls -lh "$DMG_OUT" "$ZIP_OUT"
+echo "[OK] macOS installer built and verified: $DMG_OUT"

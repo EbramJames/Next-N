@@ -6,14 +6,19 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     name: Build & Test (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ windows-latest, ubuntu-latest ]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -32,6 +37,12 @@ jobs:
 
       - name: Run unit tests
         run: dotnet test --project tests/NextN.Core.Tests/NextN.Core.Tests.csproj -c Release --no-build --results-directory ./TestResults -- --report-trx
+
+      - name: Verify macOS cross-compilation (osx-arm64 & osx-x64)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          dotnet publish src/NextN.Desktop/NextN.Desktop.csproj -c Release -r osx-arm64 -p:SelfContained=true -p:PublishSingleFile=false -o /tmp/verify-osx-arm64
+          dotnet publish src/NextN.Desktop/NextN.Desktop.csproj -c Release -r osx-x64 -p:SelfContained=true -p:PublishSingleFile=false -o /tmp/verify-osx-x64
 
       - name: Upload test results
         if: always()

@@ -14,6 +14,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  cancel-in-progress: true
+
 env:
   VERSION_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
 
@@ -21,6 +25,7 @@ jobs:
   build-windows:
     name: Windows Installer & Portable (${{ matrix.arch }})
     runs-on: windows-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -58,8 +63,9 @@ jobs:
             dist/NextN-windows-${{ matrix.arch }}-portable.zip
 
   build-macos:
-    name: macOS DMG Installer (${{ matrix.arch }})
-    runs-on: macos-latest
+    name: macOS DMG & ZIP Installer (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -73,32 +79,57 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Install packaging tools
-        run: brew install create-dmg jq
+      - name: Install macOS cross-packaging toolchain (xorriso, libdmg-hfsplus, rcodesign)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq zip unzip curl xorriso cmake build-essential zlib1g-dev p7zip-full
 
-      - name: Publish Next N (${{ matrix.arch }})
+          # Build fanquake/libdmg-hfsplus (UDZO DMG compressor, used by Bitcoin Core)
+          git clone --depth 1 --branch only_what_core_needs https://github.com/fanquake/libdmg-hfsplus.git /tmp/libdmg-hfsplus
+          cmake -S /tmp/libdmg-hfsplus -B /tmp/libdmg-hfsplus/build
+          cmake --build /tmp/libdmg-hfsplus/build -j"$(nproc)"
+          sudo install -m 0755 /tmp/libdmg-hfsplus/build/dmg/dmg /usr/local/bin/dmg
+
+          # Install rcodesign (apple-codesign) for Apple Silicon ad-hoc Mach-O signing
+          RCODESIGN_VER="0.29.0"
+          curl -fsSL --retry 4 --retry-delay 2 \
+            "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F${RCODESIGN_VER}/apple-codesign-${RCODESIGN_VER}-x86_64-unknown-linux-musl.tar.gz" \
+            -o /tmp/rcodesign.tar.gz
+          tar -C /tmp -xzf /tmp/rcodesign.tar.gz
+          sudo install -m 0755 "/tmp/apple-codesign-${RCODESIGN_VER}-x86_64-unknown-linux-musl/rcodesign" /usr/local/bin/rcodesign
+          rcodesign --version
+
+      - name: Cross-publish Next N for macOS (${{ matrix.arch }})
         run: |
           VER="${VERSION_TAG#v}"
           dotnet publish src/NextN.Desktop/NextN.Desktop.csproj -c Release -r osx-${{ matrix.arch }} -p:SelfContained=true -p:PublishSingleFile=false -p:Version="$VER" -o publish/osx-${{ matrix.arch }}
-          dotnet publish src/NextN.Updater/NextN.Updater.csproj -c Release -r osx-${{ matrix.arch }} -p:SelfContained=true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:Version="$VER" -o publish/osx-${{ matrix.arch }}
+          dotnet publish src/NextN.Updater/NextN.Updater.csproj -c Release -r osx-${{ matrix.arch }} -p:SelfContained=true -p:PublishSingleFile=false -p:Version="$VER" -o publish/osx-${{ matrix.arch }}
           find publish/osx-${{ matrix.arch }} -name '*.pdb' -delete
 
-      - name: Package macOS DMG
+      - name: Package & verify macOS DMG and ZIP
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x packaging/macos/package-osx.sh
           ./packaging/macos/package-osx.sh ${{ matrix.arch }} publish/osx-${{ matrix.arch }} "${VERSION_TAG#v}"
 
+          echo "=== Verifying DMG contents via 7z ==="
+          7z l "dist/NextN-macos-${{ matrix.arch }}.dmg" | head -n 40
+          echo "=== Verifying ZIP contents ==="
+          unzip -l "dist/NextN-macos-${{ matrix.arch }}.zip" | grep -E "Info.plist|AppIcon.icns|MacOS/NextN$|bin/xray/xray|bin/sing_box/sing-box"
+
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist-macos-${{ matrix.arch }}
-          path: dist/NextN-macos-*.dmg
+          path: |
+            dist/NextN-macos-${{ matrix.arch }}.dmg
+            dist/NextN-macos-${{ matrix.arch }}.zip
 
   build-linux:
-    name: Linux DEB & AppImage (${{ matrix.arch }})
+    name: Linux DEB, RPM, AppImage & ZIP (${{ matrix.arch }})
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -123,7 +154,7 @@ jobs:
       - name: Install Linux packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq unzip curl dpkg-dev desktop-file-utils xdg-utils rpm
+          sudo apt-get install -y jq zip unzip curl dpkg-dev desktop-file-utils xdg-utils rpm
 
       - name: Publish Next N (${{ matrix.rid }})
         run: |
@@ -154,6 +185,11 @@ jobs:
           chmod +x packaging/linux/package-appimage.sh
           ./packaging/linux/package-appimage.sh x86_64 publish/${{ matrix.rid }} "${VERSION_TAG#v}"
 
+      - name: Build Portable Linux ZIP (for in-app updater)
+        run: |
+          mkdir -p dist
+          (cd publish && zip -qry "../dist/NextN-${{ matrix.rid }}.zip" "${{ matrix.rid }}")
+
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -162,11 +198,13 @@ jobs:
             dist/NextN-linux-*.deb
             dist/NextN-linux-*.rpm
             dist/NextN-linux-*.AppImage
+            dist/NextN-linux-*.zip
 
   publish-release:
     name: Publish GitHub Release
     needs: [ build-windows, build-macos, build-linux ]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -174,9 +212,12 @@ jobs:
           path: release-assets
           merge-multiple: true
 
-      - name: Generate SHA256SUMS.txt
+      - name: List release assets & generate SHA256SUMS.txt
         working-directory: release-assets
-        run: sha256sum * > SHA256SUMS.txt
+        run: |
+          ls -lh
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
