@@ -13,7 +13,7 @@
     <PackageVersion Include="DialogHost.Avalonia" Version="0.12.3" />
     <PackageVersion Include="Downloader" Version="5.9.8" />
     <PackageVersion Include="IPNetwork2" Version="4.3.0" />
-    <PackageVersion Include="NLog" Version="6.2.1" />
+    <PackageVersion Include="NLog" Version="6.2.2" />
     <PackageVersion Include="QRCoder" Version="1.8.0" />
     <PackageVersion Include="ReactiveUI" Version="24.3.0" />
     <PackageVersion Include="ReactiveUI.Avalonia" Version="12.1.2" />
