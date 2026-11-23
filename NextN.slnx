@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+    <File Path="LICENSE" />
+    <File Path="NOTICE" />
+  </Folder>
+  <Folder Name="/CI &amp; Packaging/">
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/release.yml" />
+    <File Path="packaging/windows/NextN.nsi" />
+    <File Path="packaging/windows/build-windows.ps1" />
+    <File Path="packaging/windows/fetch-cores.ps1" />
+    <File Path="packaging/macos/package-osx.sh" />
+    <File Path="packaging/linux/package-debian.sh" />
+    <File Path="packaging/linux/package-rhel.sh" />
+    <File Path="packaging/linux/package-appimage.sh" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/NextN.Core/NextN.Core.csproj" />
+    <Project Path="src/NextN.Desktop/NextN.Desktop.csproj" />
+    <Project Path="src/NextN.UdpTest/NextN.UdpTest.csproj" />
+    <Project Path="src/NextN.Updater/NextN.Updater.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NextN.Core.Tests/NextN.Core.Tests.csproj" />
+  </Folder>
+</Solution>

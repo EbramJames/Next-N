@@ -1,0 +1,14 @@
+* text=auto eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ico binary
+*.icns binary
+*.png binary
+*.bmp binary
+*.jpg binary
+*.ttf binary
+*.otf binary
+*.zip binary
+*.exe binary

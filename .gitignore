@@ -1,0 +1,48 @@
+﻿# Build outputs
+bin/
+obj/
+out/
+dist/
+publish/
+artifacts/
+TestResults/
+*.binlog
+*.pdb
+*.nupkg
+*.snupkg
+
+# Packaging outputs & local downloaded cores
+*.exe
+*.zip
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+*.tar.gz
+*.sig
+!packaging/**/*.ico
+!packaging/**/*.bmp
+!packaging/**/*.png
+
+# User / IDE files
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.user
+*.suo
+*.rsuser
+*.sln.iml
+*.DotSettings.user
+.DS_Store
+Thumbs.db
+
+# Runtime local data if run from workspace
+guiConfigs/
+guiTemps/
+guiLogs/
+guiBackups/
+guiFonts/
+binConfigs/

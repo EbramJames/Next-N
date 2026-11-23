@@ -1,0 +1,29 @@
+Next N
+Copyright (C) 2026 EbramJames <ebramjames630@gmail.com>
+Repository: https://github.com/EbramJames/Next-N
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+UPSTREAM DERIVATION & MODIFICATION NOTICE (GNU GPL v3, Section 5)
+-----------------------------------------------------------------
+Next N is a substantially re-engineered derivative work originally based on
+v2rayN (Copyright (C) 2019-Present 2dust, licensed under GNU GPL v3.0).
+
+Summary of major modifications made in 2026 by EbramJames:
+- Unified cross-platform desktop architecture onto Avalonia 12 + .NET 10
+  (retired legacy Windows-only WPF duplicate codebase).
+- Completely redesigned modern sidebar navigation shell, theme tokens,
+  brand identity, icons, and unified status/control dock.
+- Replaced external GlobalHotKeys git submodule with a self-contained
+  Win32 message-thread hotkey engine.
+- Hardened SQLite query layer with parameterized queries, fixed dynamic
+  Avalonia style accumulation leaks, fixed single-instance mutex lifetime
+  on Unix platforms, and fixed non-Windows core chmod handling.
+- Added native NSIS Windows Setup Installer with bundled Xray-core,
+  sing-box, and GeoIP/GeoSite rule-sets, plus unified macOS DMG and Linux
+  DEB / RPM / AppImage packaging pipelines.
+- Removed bundled third-party promotional links and replaced them with a
+  native About dialog and transparent GitHub release workflow.
