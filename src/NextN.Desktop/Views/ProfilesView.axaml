@@ -1,0 +1,381 @@
+<UserControl
+    x:Class="NextN.Desktop.Views.ProfilesView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="using:NextN.Desktop.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="clr-namespace:NextN.Desktop.DesignData"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:resx="clr-namespace:NextN.Core.Resx;assembly=NextN.Core"
+    xmlns:vms="clr-namespace:NextN.Core.ViewModels;assembly=NextN.Core"
+    x:Name="Root"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vms:ProfilesViewModel"
+    Design.DataContext="{x:Static dd:DesignData.Profiles}"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <conv:DelayColorConverter x:Key="DelayColorConverter" />
+    </UserControl.Resources>
+
+    <DockPanel>
+        <!-- Clean Modern Toolbar Card -->
+        <Border
+            Margin="0,0,0,10"
+            Padding="10,8"
+            Classes="SurfaceCard"
+            DockPanel.Dock="Top">
+            <DockPanel>
+                <!-- Right Search & Quick Speed Tools -->
+                <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <TextBox
+                        x:Name="txtServerFilter"
+                        Width="248"
+                        VerticalContentAlignment="Center"
+                        PlaceholderText="{x:Static resx:ResUI.MsgServerTitle}"
+                        ToolTip.Tip="{x:Static resx:ResUI.MsgServerTitle}">
+                        <TextBox.InnerLeftContent>
+                            <PathIcon
+                                Width="14"
+                                Height="14"
+                                Margin="8,0,2,0"
+                                Data="{StaticResource IconSearch}" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+
+                    <Button
+                        x:Name="btnFastRealPing"
+                        Classes="IconButton"
+                        ToolTip.Tip="{x:Static resx:ResUI.menuFastRealPing}">
+                        <PathIcon
+                            Data="{StaticResource SemiIconBolt}"
+                            Foreground="{DynamicResource NextNSuccessBrush}" />
+                    </Button>
+
+                    <Button
+                        x:Name="menuMixedTestServer"
+                        Classes="IconButton"
+                        ToolTip.Tip="{x:Static resx:ResUI.menuMixedTestServer}">
+                        <PathIcon
+                            Data="{StaticResource building_ping}"
+                            Foreground="{DynamicResource NextNCyanBrush}" />
+                    </Button>
+
+                    <Button
+                        x:Name="btnAutofitColumnWidth"
+                        Classes="IconButton"
+                        ToolTip.Tip="{x:Static resx:ResUI.menuProfileAutofitColumnWidth}">
+                        <PathIcon Data="{StaticResource SemiIconExpand}" />
+                    </Button>
+                </StackPanel>
+
+                <!-- Left Subscription Pills + Edit/Add Group -->
+                <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <ListBox
+                        x:Name="lstGroup"
+                        Margin="0,0,6,0"
+                        DisplayMemberBinding="{Binding Remarks}"
+                        ItemsSource="{Binding SubItems}"
+                        Theme="{DynamicResource PureCardRadioGroupListBox}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem x:Name="menuSubEdit" Header="{x:Static resx:ResUI.menuSubEdit}" />
+                                <MenuItem x:Name="menuSubAdd" Header="{x:Static resx:ResUI.menuSubAdd}" />
+                                <MenuItem x:Name="menuSubDelete" Header="{x:Static resx:ResUI.menuSubDelete}" />
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
+
+                    <Button
+                        x:Name="btnEditSub"
+                        Margin="2,0"
+                        Classes="IconButton"
+                        ToolTip.Tip="{x:Static resx:ResUI.menuSubEdit}">
+                        <PathIcon Data="{StaticResource SemiIconEdit}" />
+                    </Button>
+                    <Button
+                        x:Name="btnAddSub"
+                        Margin="2,0"
+                        Classes="IconButton"
+                        ToolTip.Tip="{x:Static resx:ResUI.menuSubAdd}">
+                        <PathIcon
+                            Data="{StaticResource SemiIconPlus}"
+                            Foreground="{DynamicResource NextNAccentBrush}" />
+                    </Button>
+                </WrapPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Clean Rounded Server List Card -->
+        <Border ClipToBounds="True" Classes="SurfaceCard">
+            <Grid>
+                <DataGrid
+                x:Name="lstProfiles"
+                AutoGenerateColumns="False"
+                BorderThickness="0"
+                CanUserReorderColumns="True"
+                CanUserResizeColumns="True"
+                Classes.InsetContent="True"
+                GridLinesVisibility="Horizontal"
+                HeadersVisibility="All"
+                IsReadOnly="True"
+                ItemsSource="{Binding ProfileItems}">
+                <DataGrid.KeyBindings>
+                    <KeyBinding Command="{Binding Export2ShareUrlCmd}" Gesture="Ctrl+C" />
+                    <KeyBinding Command="{Binding SetDefaultServerCmd}" Gesture="Enter" />
+                </DataGrid.KeyBindings>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            x:Name="menuSetDefaultServer"
+                            Header="{x:Static resx:ResUI.menuSetDefaultServer}"
+                            InputGesture="Enter" />
+                        <MenuItem
+                            x:Name="menuEditServer"
+                            Header="{x:Static resx:ResUI.menuEditServer}"
+                            InputGesture="Ctrl+D" />
+                        <MenuItem x:Name="menuCopyServer" Header="{x:Static resx:ResUI.menuCopyServer}" />
+                        <MenuItem
+                            x:Name="menuRemoveServer"
+                            Header="{x:Static resx:ResUI.menuRemoveServer}"
+                            InputGesture="Back" />
+                        <MenuItem x:Name="menuRemoveDuplicateServer" Header="{x:Static resx:ResUI.menuRemoveDuplicateServer}" />
+                        <MenuItem x:Name="menuRemoveInvalidServerResult" Header="{x:Static resx:ResUI.menuRemoveInvalidServerResult}" />
+                        <Separator />
+                        <MenuItem
+                            x:Name="menuTcpingServer"
+                            Header="{x:Static resx:ResUI.menuTcpingServer}"
+                            InputGesture="Ctrl+O" />
+                        <MenuItem
+                            x:Name="menuRealPingServer"
+                            Header="{x:Static resx:ResUI.menuRealPingServer}"
+                            InputGesture="Ctrl+R" />
+                        <MenuItem
+                            x:Name="menuSpeedServer"
+                            Header="{x:Static resx:ResUI.menuSpeedServer}"
+                            InputGesture="Ctrl+T" />
+                        <MenuItem x:Name="menuUdpTestServer" Header="{x:Static resx:ResUI.menuUdpTestServer}" />
+                        <MenuItem x:Name="menuSortServerResult" Header="{x:Static resx:ResUI.menuSortServerResult}" />
+                        <Separator />
+                        <MenuItem
+                            x:Name="menuMoveToGroup"
+                            Header="{x:Static resx:ResUI.menuMoveToGroup}"
+                            ItemsSource="{Binding DataContext.SubItems, ElementName=Root}">
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate>
+                                    <MenuItem
+                                        Command="{Binding DataContext.MoveToGroupCmd, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Header="{Binding Remarks}" />
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
+                        </MenuItem>
+                        <MenuItem Header="{x:Static resx:ResUI.menuMoveTo}">
+                            <MenuItem
+                                x:Name="menuMoveTop"
+                                Header="{x:Static resx:ResUI.menuMoveTop}"
+                                InputGesture="T" />
+                            <MenuItem
+                                x:Name="menuMoveUp"
+                                Header="{x:Static resx:ResUI.menuMoveUp}"
+                                InputGesture="U" />
+                            <MenuItem
+                                x:Name="menuMoveDown"
+                                Header="{x:Static resx:ResUI.menuMoveDown}"
+                                InputGesture="D" />
+                            <MenuItem
+                                x:Name="menuMoveBottom"
+                                Header="{x:Static resx:ResUI.menuMoveBottom}"
+                                InputGesture="B" />
+                        </MenuItem>
+                        <MenuItem
+                            x:Name="menuSelectAll"
+                            Header="{x:Static resx:ResUI.menuSelectAll}"
+                            InputGesture="Ctrl+A" />
+                        <Separator />
+                        <MenuItem
+                            x:Name="menuShareServer"
+                            Header="{x:Static resx:ResUI.menuShareServer}"
+                            InputGesture="Ctrl+F" />
+                        <MenuItem Header="{x:Static resx:ResUI.menuExportConfig}">
+                            <MenuItem x:Name="menuExport2ClientConfig" Header="{x:Static resx:ResUI.menuExport2ClientConfig}" />
+                            <MenuItem x:Name="menuExport2ClientConfigClipboard" Header="{x:Static resx:ResUI.menuExport2ClientConfigClipboard}" />
+                            <Separator />
+                            <MenuItem
+                                x:Name="menuExport2ShareUrl"
+                                Header="{x:Static resx:ResUI.menuExport2ShareUrl}"
+                                InputGesture="Ctrl+C" />
+                            <MenuItem x:Name="menuExport2ShareUrlBase64" Header="{x:Static resx:ResUI.menuExport2ShareUrlBase64}" />
+                            <MenuItem x:Name="menuExport2InnerUri" Header="{x:Static resx:ResUI.menuExport2InnerUri}" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="{x:Static resx:ResUI.menuGenGroupServer}">
+                            <MenuItem x:Name="menuGenGroupAllServer" Header="{x:Static resx:ResUI.menuAllServers}" />
+                            <MenuItem x:Name="menuGenGroupRegionServer" Header="{x:Static resx:ResUI.menuGenRegionGroup}" />
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="96"
+                        Binding="{Binding ConfigType}"
+                        Header="{x:Static resx:ResUI.LvServiceType}"
+                        Tag="ConfigType" />
+
+                    <DataGridTemplateColumn Width="220" SortMemberPath="Remarks" Tag="Remarks">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="{x:Static resx:ResUI.LvRemarks}" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="8,0" Orientation="Horizontal" Spacing="6">
+                                    <Border
+                                        Padding="7,2"
+                                        VerticalAlignment="Center"
+                                        Background="{DynamicResource NextNSuccessBrush}"
+                                        CornerRadius="999"
+                                        IsVisible="{Binding IsActive}">
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            FontWeight="Bold"
+                                            Foreground="#FFFFFF"
+                                            Text="{x:Static resx:ResUI.TipActiveServer}" />
+                                    </Border>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontWeight="Medium"
+                                        Text="{Binding Remarks}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn
+                        Width="155"
+                        Binding="{Binding Address}"
+                        Header="{x:Static resx:ResUI.LvAddress}"
+                        Tag="Address" />
+                    <DataGridTextColumn
+                        Width="72"
+                        Binding="{Binding Port}"
+                        Header="{x:Static resx:ResUI.LvPort}"
+                        Tag="Port" />
+                    <DataGridTextColumn
+                        Width="112"
+                        Binding="{Binding Network}"
+                        Header="{x:Static resx:ResUI.LvTransportProtocol}"
+                        Tag="Network" />
+                    <DataGridTextColumn
+                        Width="88"
+                        Binding="{Binding StreamSecurity}"
+                        Header="{x:Static resx:ResUI.LvTLS}"
+                        Tag="StreamSecurity" />
+                    <DataGridTextColumn
+                        Width="126"
+                        Binding="{Binding SubRemarks}"
+                        Header="{x:Static resx:ResUI.LvSubscription}"
+                        Tag="SubRemarks" />
+                    <DataGridTemplateColumn Width="108" SortMemberPath="Delay" Tag="DelayVal">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="{x:Static resx:ResUI.LvTestDelay}" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="8,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    FontWeight="SemiBold"
+                                    Foreground="{Binding Delay, Converter={StaticResource DelayColorConverter}}"
+                                    Text="{Binding Path=DelayVal, Mode=OneWay}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn
+                        Width="112"
+                        Binding="{Binding SpeedVal}"
+                        Header="{x:Static resx:ResUI.LvTestSpeed}"
+                        Tag="SpeedVal" />
+
+                    <DataGridTemplateColumn Width="130" SortMemberPath="IpInfo" Tag="IpInfo">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock Text="{x:Static resx:ResUI.LvTestIpInfo}" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <SelectableTextBlock
+                                    Margin="8,0"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Path=IpInfo, Mode=OneWay}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn
+                        Width="110"
+                        Binding="{Binding TodayUp}"
+                        Header="{x:Static resx:ResUI.LvTodayUploadDataAmount}"
+                        Tag="TodayUp" />
+                    <DataGridTextColumn
+                        Width="110"
+                        Binding="{Binding TodayDown}"
+                        Header="{x:Static resx:ResUI.LvTodayDownloadDataAmount}"
+                        Tag="TodayDown" />
+                    <DataGridTextColumn
+                        Width="110"
+                        Binding="{Binding TotalUp}"
+                        Header="{x:Static resx:ResUI.LvTotalUploadDataAmount}"
+                        Tag="TotalUp" />
+                    <DataGridTextColumn
+                        Width="110"
+                        Binding="{Binding TotalDown}"
+                        Header="{x:Static resx:ResUI.LvTotalDownloadDataAmount}"
+                        Tag="TotalDown" />
+                </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Modern Empty-State Onboarding Overlay -->
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsHitTestVisible="False"
+                    IsVisible="{Binding !ProfileItems.Count}"
+                    Spacing="10">
+                    <Border
+                        Width="56"
+                        Height="56"
+                        HorizontalAlignment="Center"
+                        Background="{DynamicResource NextNAccentSoftBrush}"
+                        CornerRadius="16">
+                        <PathIcon
+                            Width="26"
+                            Height="26"
+                            Data="{StaticResource IconShield}"
+                            Foreground="{DynamicResource NextNAccentBrush}" />
+                    </Border>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource NextNTextPrimary}"
+                        Text="Ready to connect" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="12.5"
+                        Foreground="{DynamicResource NextNTextMuted}"
+                        Text="Press Ctrl + V to import share links from clipboard, or click + Servers above." />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </DockPanel>
+</UserControl>

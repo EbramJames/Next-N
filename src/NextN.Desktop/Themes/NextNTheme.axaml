@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="NextNCanvasBg" Color="#0D1017" />
+            <SolidColorBrush x:Key="NextNSidebarBg" Color="#121622" />
+            <SolidColorBrush x:Key="NextNSurfaceBg" Color="#171C2B" />
+            <SolidColorBrush x:Key="NextNSurfaceElevatedBg" Color="#1E2538" />
+            <SolidColorBrush x:Key="NextNHoverBg" Color="#242C42" />
+            <SolidColorBrush x:Key="NextNBorderBrush" Color="#252E44" />
+            <SolidColorBrush x:Key="NextNBorderSubtleBrush" Color="#1C2336" />
+            <SolidColorBrush x:Key="NextNAccentBrush" Color="#6366F1" />
+            <SolidColorBrush x:Key="NextNAccentHoverBrush" Color="#818CF8" />
+            <SolidColorBrush x:Key="NextNAccentSoftBg" Color="#222647" />
+            <SolidColorBrush x:Key="NextNCyanBrush" Color="#22D3EE" />
+            <SolidColorBrush x:Key="NextNSuccessBrush" Color="#10B981" />
+            <SolidColorBrush x:Key="NextNSuccessSoftBg" Color="#112E28" />
+            <SolidColorBrush x:Key="NextNWarningBrush" Color="#F59E0B" />
+            <SolidColorBrush x:Key="NextNDangerBrush" Color="#F43F5E" />
+            <SolidColorBrush x:Key="NextNTextPrimary" Color="#F1F5F9" />
+            <SolidColorBrush x:Key="NextNTextSecondary" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="NextNTextMuted" Color="#8B98B0" />
+            <SolidColorBrush x:Key="NextNNavActiveBg" Color="#202843" />
+            <SolidColorBrush x:Key="NextNNavActiveFg" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NextNNavIdleFg" Color="#94A3B8" />
+            <SolidColorBrush x:Key="NextNCardShadowColor" Color="#40000000" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="NextNCanvasBg" Color="#F4F6FB" />
+            <SolidColorBrush x:Key="NextNSidebarBg" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NextNSurfaceBg" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NextNSurfaceElevatedBg" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="NextNHoverBg" Color="#F1F5F9" />
+            <SolidColorBrush x:Key="NextNBorderBrush" Color="#E2E8F0" />
+            <SolidColorBrush x:Key="NextNBorderSubtleBrush" Color="#EDF2F7" />
+            <SolidColorBrush x:Key="NextNAccentBrush" Color="#4F46E5" />
+            <SolidColorBrush x:Key="NextNAccentHoverBrush" Color="#6366F1" />
+            <SolidColorBrush x:Key="NextNAccentSoftBg" Color="#EEF2FF" />
+            <SolidColorBrush x:Key="NextNCyanBrush" Color="#0891B2" />
+            <SolidColorBrush x:Key="NextNSuccessBrush" Color="#059669" />
+            <SolidColorBrush x:Key="NextNSuccessSoftBg" Color="#ECFDF5" />
+            <SolidColorBrush x:Key="NextNWarningBrush" Color="#D97706" />
+            <SolidColorBrush x:Key="NextNDangerBrush" Color="#E11D48" />
+            <SolidColorBrush x:Key="NextNTextPrimary" Color="#0F172A" />
+            <SolidColorBrush x:Key="NextNTextSecondary" Color="#334155" />
+            <SolidColorBrush x:Key="NextNTextMuted" Color="#64748B" />
+            <SolidColorBrush x:Key="NextNNavActiveBg" Color="#EEF2FF" />
+            <SolidColorBrush x:Key="NextNNavActiveFg" Color="#3730A3" />
+            <SolidColorBrush x:Key="NextNNavIdleFg" Color="#475569" />
+            <SolidColorBrush x:Key="NextNCardShadowColor" Color="#14000000" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

@@ -1,0 +1,123 @@
+<UserControl
+    x:Class="NextN.Desktop.Views.MsgView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="clr-namespace:NextN.Desktop.DesignData"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:resx="clr-namespace:NextN.Core.Resx;assembly=NextN.Core"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Design.DataContext="{x:Static dd:DesignData.Msg}"
+    mc:Ignorable="d">
+    <DockPanel>
+        <Border
+            Margin="0,0,0,10"
+            Padding="12,8"
+            Classes="SurfaceCard"
+            DockPanel.Dock="Top">
+            <WrapPanel VerticalAlignment="Center" Orientation="Horizontal">
+                <TextBox
+                    x:Name="cmbMsgFilter"
+                    Width="220"
+                    Margin="0,0,10,0"
+                    VerticalContentAlignment="Center"
+                    PlaceholderText="{x:Static resx:ResUI.MsgFilterTitle}"
+                    ToolTip.Tip="{x:Static resx:ResUI.MsgFilterTitle}">
+                    <TextBox.InnerLeftContent>
+                        <PathIcon
+                            Width="14"
+                            Height="14"
+                            Margin="8,0,2,0"
+                            Data="{StaticResource IconSearch}" />
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+
+                <Button
+                    x:Name="btnCopy"
+                    Margin="2,0"
+                    Classes="IconButton"
+                    Click="menuMsgViewCopyAll_Click"
+                    ToolTip.Tip="{x:Static resx:ResUI.menuMsgViewCopyAll}">
+                    <PathIcon Data="{StaticResource SemiIconCopy}" />
+                </Button>
+                <Button
+                    x:Name="btnClear"
+                    Margin="2,0,12,0"
+                    Classes="IconButton"
+                    Click="menuMsgViewClear_Click"
+                    ToolTip.Tip="{x:Static resx:ResUI.menuMsgViewClear}">
+                    <PathIcon Data="{StaticResource SemiIconDelete}" />
+                </Button>
+
+                <StackPanel
+                    Margin="0,0,14,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Foreground="{DynamicResource NextNTextSecondary}"
+                        Text="{x:Static resx:ResUI.TbAutoRefresh}" />
+                    <ToggleSwitch
+                        x:Name="togAutoRefresh"
+                        IsChecked="True"
+                        Theme="{DynamicResource SimpleToggleSwitch}" />
+                </StackPanel>
+
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Foreground="{DynamicResource NextNTextSecondary}"
+                        Text="{x:Static resx:ResUI.TbAutoScrollToEnd}" />
+                    <ToggleSwitch
+                        x:Name="togScrollToEnd"
+                        IsChecked="True"
+                        Theme="{DynamicResource SimpleToggleSwitch}" />
+                </StackPanel>
+            </WrapPanel>
+        </Border>
+
+        <Border Padding="8" Classes="SurfaceCard">
+            <avaloniaEdit:TextEditor
+                Name="txtMsg"
+                FontFamily="Cascadia Code, Consolas, Menlo, monospace"
+                FontSize="12.5"
+                IsReadOnly="True"
+                VerticalScrollBarVisibility="Auto"
+                WordWrap="True">
+                <avaloniaEdit:TextEditor.Options>
+                    <avaloniaEdit:TextEditorOptions AllowScrollBelowDocument="False" />
+                </avaloniaEdit:TextEditor.Options>
+                <avaloniaEdit:TextEditor.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuItem
+                            x:Name="menuMsgViewSelectAll"
+                            Click="menuMsgViewSelectAll_Click"
+                            Header="{x:Static resx:ResUI.menuMsgViewSelectAll}"
+                            InputGesture="Ctrl+A" />
+                        <MenuItem
+                            x:Name="menuMsgViewCopy"
+                            Click="menuMsgViewCopy_Click"
+                            Header="{x:Static resx:ResUI.menuMsgViewCopy}"
+                            InputGesture="Ctrl+C" />
+                        <MenuItem
+                            x:Name="menuMsgViewCopyAll"
+                            Click="menuMsgViewCopyAll_Click"
+                            Header="{x:Static resx:ResUI.menuMsgViewCopyAll}" />
+                        <MenuItem
+                            x:Name="menuMsgViewClear"
+                            Click="menuMsgViewClear_Click"
+                            Header="{x:Static resx:ResUI.menuMsgViewClear}" />
+                    </MenuFlyout>
+                </avaloniaEdit:TextEditor.ContextFlyout>
+            </avaloniaEdit:TextEditor>
+        </Border>
+    </DockPanel>
+</UserControl>

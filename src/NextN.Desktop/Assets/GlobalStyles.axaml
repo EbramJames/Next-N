@@ -1,0 +1,123 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20" />
+    </Design.PreviewWith>
+
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{DynamicResource NextNCanvasBg}" />
+    </Style>
+
+    <Style Selector="DataGrid">
+        <Setter Property="RowHeight" Value="36" />
+        <Setter Property="GridLinesVisibility" Value="Horizontal" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource NextNBorderSubtleBrush}" />
+        <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NextNBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NextNSurfaceBg}" />
+    </Style>
+
+    <Style Selector="PathIcon">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource NextNTextMuted}" />
+    </Style>
+
+    <Style Selector="TextBox">
+        <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <Style Selector="ScrollViewer">
+        <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+
+    <Style Selector="TabControl">
+        <Setter Property="Theme" Value="{StaticResource LineTabControl}" />
+    </Style>
+
+    <Style Selector="Button.IconButton">
+        <Setter Property="Width" Value="{StaticResource IconButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource IconButtonHeight}" />
+        <Setter Property="MinWidth" Value="{StaticResource IconButtonWidth}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Theme" Value="{DynamicResource BorderlessButton}" />
+    </Style>
+
+    <!-- Next N Modern Sidebar Navigation Button -->
+    <Style Selector="Button.NavButton">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="12,9" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource NextNNavIdleFg}" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.NavButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource NextNHoverBg}" />
+    </Style>
+    <Style Selector="Button.NavButton.Active">
+        <Setter Property="Background" Value="{DynamicResource NextNNavActiveBg}" />
+        <Setter Property="Foreground" Value="{DynamicResource NextNNavActiveFg}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.NavButton.Active PathIcon">
+        <Setter Property="Foreground" Value="{DynamicResource NextNAccentBrush}" />
+    </Style>
+
+    <!-- Primary Accent Action Button -->
+    <Style Selector="Button.PrimaryAction">
+        <Setter Property="Background" Value="{DynamicResource NextNAccentBrush}" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="14,7" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.PrimaryAction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource NextNAccentHoverBrush}" />
+    </Style>
+    <Style Selector="Button.PrimaryAction PathIcon">
+        <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+
+    <!-- Secondary Subtle Surface Button -->
+    <Style Selector="Button.SubtleAction">
+        <Setter Property="Background" Value="{DynamicResource NextNSurfaceElevatedBg}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NextNBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource NextNTextPrimary}" />
+        <Setter Property="Padding" Value="12,7" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.SubtleAction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource NextNHoverBg}" />
+    </Style>
+
+    <!-- Surface Card Container -->
+    <Style Selector="Border.SurfaceCard">
+        <Setter Property="Background" Value="{DynamicResource NextNSurfaceBg}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NextNBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+    </Style>
+
+    <!-- Compact Pill Badge -->
+    <Style Selector="Border.BadgePill">
+        <Setter Property="Background" Value="{DynamicResource NextNAccentSoftBg}" />
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="8,3" />
+    </Style>
+</Styles>

@@ -1,0 +1,116 @@
+<UserControl
+    x:Class="NextN.Desktop.Views.AboutView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="420">
+    <Border
+        Padding="28,24"
+        Background="{DynamicResource NextNSurfaceBg}"
+        CornerRadius="12">
+        <StackPanel Spacing="16">
+            <StackPanel HorizontalAlignment="Center" Spacing="10">
+                <Image
+                    Width="68"
+                    Height="68"
+                    HorizontalAlignment="Center"
+                    Source="avares://NextN/Assets/NextN.png" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource NextNTextPrimary}"
+                    Text="Next N" />
+                <Border
+                    HorizontalAlignment="Center"
+                    Classes="BadgePill">
+                    <TextBlock
+                        x:Name="txtVersion"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource NextNAccentBrush}" />
+                </Border>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    Foreground="{DynamicResource NextNTextMuted}"
+                    Text="Modern Cross-Platform Proxy &amp; Tunnel Client" />
+            </StackPanel>
+
+            <Border
+                Padding="14,12"
+                Background="{DynamicResource NextNSurfaceElevatedBg}"
+                BorderBrush="{DynamicResource NextNBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel Spacing="6">
+                    <DockPanel>
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource NextNTextMuted}"
+                            Text="Publisher" />
+                        <TextBlock
+                            HorizontalAlignment="Right"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource NextNTextPrimary}"
+                            Text="EbramJames" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource NextNTextMuted}"
+                            Text="Engine Support" />
+                        <TextBlock
+                            HorizontalAlignment="Right"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource NextNTextPrimary}"
+                            Text="Xray-core / sing-box / mihomo" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource NextNTextMuted}"
+                            Text="License" />
+                        <TextBlock
+                            HorizontalAlignment="Right"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource NextNTextPrimary}"
+                            Text="GNU GPL v3.0" />
+                    </DockPanel>
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        FontSize="11"
+                        Foreground="{DynamicResource NextNTextMuted}"
+                        Text="Re-engineered and maintained by EbramJames. Derived from v2rayN (GPL-3.0) with a unified Avalonia cross-platform UI and native installers."
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <Grid ColumnDefinitions="*,10,*">
+                <Button
+                    x:Name="btnOpenGithub"
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Classes="PrimaryAction"
+                    Content="GitHub Repository" />
+                <Button
+                    x:Name="btnOpenIssues"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Classes="SubtleAction"
+                    Content="Report Issue" />
+            </Grid>
+
+            <Button
+                x:Name="btnClose"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Classes="SubtleAction"
+                Content="Close" />
+        </StackPanel>
+    </Border>
+</UserControl>

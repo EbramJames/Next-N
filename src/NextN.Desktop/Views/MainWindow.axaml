@@ -1,0 +1,476 @@
+<Window
+    x:Class="NextN.Desktop.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="clr-namespace:NextN.Desktop.DesignData"
+    xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:resx="clr-namespace:NextN.Core.Resx;assembly=NextN.Core"
+    xmlns:vms="clr-namespace:NextN.Core.ViewModels;assembly=NextN.Core"
+    Title="Next N"
+    Width="1240"
+    Height="820"
+    MinWidth="840"
+    MinHeight="560"
+    x:DataType="vms:MainWindowViewModel"
+    Design.DataContext="{x:Static dd:DesignData.MainWindow}"
+    Icon="/Assets/NotifyIcon1.ico"
+    ShowInTaskbar="True"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Window.Styles>
+        <!-- Hide tab strip in split log pane when Clash UI tabs are hidden -->
+        <Style Selector="TabControl.logPane /template/ ItemsPresenter#PART_ItemsPresenter">
+            <Setter Property="IsVisible" Value="{Binding ShowClashUI}" />
+        </Style>
+        <Style Selector="TabControl.logPane /template/ Border#PART_BorderSeparator">
+            <Setter Property="IsVisible" Value="{Binding ShowClashUI}" />
+        </Style>
+        <!-- Hide built-in tab strip in unified sidebar mode (driven by sidebar nav buttons) -->
+        <Style Selector="TabControl.sidebarDriven /template/ ItemsPresenter#PART_ItemsPresenter">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="TabControl.sidebarDriven /template/ Border#PART_BorderSeparator">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </Window.Styles>
+
+    <dialogHost:DialogHost CloseOnClickAway="True" DisableOpeningAnimation="True">
+        <Grid ColumnDefinitions="240,*">
+            <!-- ═══════════════ LEFT SIDEBAR RAIL ═══════════════ -->
+            <Border
+                Grid.Column="0"
+                Background="{DynamicResource NextNSidebarBg}"
+                BorderBrush="{DynamicResource NextNBorderBrush}"
+                BorderThickness="0,0,1,0">
+                <DockPanel Margin="14,16,14,12">
+                    <!-- Brand Header -->
+                    <StackPanel DockPanel.Dock="Top" Spacing="14">
+                        <DockPanel>
+                            <Border
+                                Width="38"
+                                Height="38"
+                                Margin="0,0,10,0"
+                                ClipToBounds="True"
+                                CornerRadius="10"
+                                DockPanel.Dock="Left">
+                                <Image Source="avares://NextN/Assets/NextN.png" Stretch="UniformToFill" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock
+                                        FontSize="17"
+                                        FontWeight="Bold"
+                                        Foreground="{DynamicResource NextNTextPrimary}"
+                                        Text="Next N" />
+                                    <Border
+                                        VerticalAlignment="Center"
+                                        Classes="BadgePill"
+                                        Padding="6,1">
+                                        <TextBlock
+                                            x:Name="txtBrandVersion"
+                                            FontSize="10"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource NextNAccentBrush}"
+                                            Text="v1.0.0" />
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock
+                                    x:Name="txtBrandSubtitle"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource NextNTextMuted}"
+                                    Text="Network Proxy Suite" />
+                            </StackPanel>
+                        </DockPanel>
+
+                        <!-- Active Node Hero Card -->
+                        <Border
+                            x:Name="cardActiveNode"
+                            Padding="12,10"
+                            Background="{DynamicResource NextNSurfaceElevatedBg}"
+                            BorderBrush="{DynamicResource NextNBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Cursor="Hand"
+                            ToolTip.Tip="Click to test current connection">
+                            <StackPanel Spacing="5">
+                                <DockPanel>
+                                    <Button
+                                        x:Name="btnQuickReload"
+                                        Width="26"
+                                        Height="26"
+                                        MinWidth="26"
+                                        Padding="0"
+                                        Classes="IconButton"
+                                        DockPanel.Dock="Right"
+                                        ToolTip.Tip="{x:Static resx:ResUI.menuReload}">
+                                        <PathIcon
+                                            Width="13"
+                                            Height="13"
+                                            Data="{StaticResource SemiIconRefresh}" />
+                                    </Button>
+                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="6">
+                                        <Ellipse
+                                            x:Name="dotStatus"
+                                            Width="8"
+                                            Height="8"
+                                            Fill="{DynamicResource NextNAccentBrush}" />
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource NextNTextMuted}"
+                                            Text="ACTIVE NODE" />
+                                    </StackPanel>
+                                </DockPanel>
+                                <TextBlock
+                                    x:Name="txtSidebarServer"
+                                    FontSize="12.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource NextNTextPrimary}"
+                                    MaxLines="2"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    x:Name="txtSidebarLatency"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource NextNCyanBrush}"
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Bottom Utility Bar -->
+                    <StackPanel DockPanel.Dock="Bottom" Spacing="8">
+                        <Button
+                            x:Name="btnNewUpdate"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Classes="PrimaryAction"
+                            Content="{x:Static resx:ResUI.menuNewUpdate}"
+                            IsVisible="False" />
+
+                        <Border
+                            Height="1"
+                            Margin="2,4"
+                            Background="{DynamicResource NextNBorderSubtleBrush}" />
+
+                        <Grid ColumnDefinitions="*,*,*,*">
+                            <ContentControl
+                                x:Name="conTheme"
+                                Grid.Column="0"
+                                HorizontalAlignment="Center" />
+                            <Button
+                                x:Name="btnSidebarBackup"
+                                Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                Classes="IconButton"
+                                ToolTip.Tip="{x:Static resx:ResUI.menuBackupAndRestore}">
+                                <PathIcon Data="{StaticResource IconBackup}" />
+                            </Button>
+                            <Button
+                                x:Name="btnSidebarUpdate"
+                                Grid.Column="2"
+                                HorizontalAlignment="Center"
+                                Classes="IconButton"
+                                ToolTip.Tip="{x:Static resx:ResUI.menuCheckUpdate}">
+                                <PathIcon Data="{StaticResource IconUpdate}" />
+                            </Button>
+                            <Button
+                                x:Name="btnSidebarAbout"
+                                Grid.Column="3"
+                                HorizontalAlignment="Center"
+                                Classes="IconButton"
+                                ToolTip.Tip="About Next N">
+                                <PathIcon Data="{StaticResource IconInfo}" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Scrollable Sidebar Navigation -->
+                    <ScrollViewer Margin="0,14,0,10" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="14">
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    Margin="10,0,0,4"
+                                    FontSize="10.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource NextNTextMuted}"
+                                    Text="WORKSPACE" />
+                                <Button x:Name="navServers" Classes="NavButton Active">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconServers}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuServers}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button
+                                    x:Name="navProxies"
+                                    Classes="NavButton"
+                                    IsVisible="{Binding ShowClashUI}">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconProxies}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.TbProxies}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button
+                                    x:Name="navConnections"
+                                    Classes="NavButton"
+                                    IsVisible="{Binding ShowClashUI}">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconConnections}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.TbConnections}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="navLogs" Classes="NavButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconLogs}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.MsgInformationTitle}" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    Margin="10,0,0,4"
+                                    FontSize="10.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource NextNTextMuted}"
+                                    Text="CONFIGURATION" />
+                                <Button x:Name="btnNavSubscriptions" Classes="NavButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconSubs}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuSubscription}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="btnNavRouting" Classes="NavButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconRouting}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuRoutingSetting}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="btnNavDns" Classes="NavButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconDns}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuDNSSetting}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="btnNavSettings" Classes="NavButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Data="{StaticResource IconSettings}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuOptionSetting}" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- ═══════════════ RIGHT WORKSPACE CANVAS ═══════════════ -->
+            <DockPanel Grid.Column="1" Background="{DynamicResource NextNCanvasBg}">
+                <!-- Clean Top Action Bar -->
+                <Border
+                    Padding="18,12"
+                    Background="{DynamicResource NextNSurfaceBg}"
+                    BorderBrush="{DynamicResource NextNBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    DockPanel.Dock="Top">
+                    <DockPanel>
+                        <!-- Right Quick Actions -->
+                        <StackPanel
+                            DockPanel.Dock="Right"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <!-- + Add Server Primary Button -->
+                            <Button x:Name="btnAddServerMenu" Classes="PrimaryAction">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Width="14" Height="14" Data="{StaticResource IconPlus}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuServers}" />
+                                </StackPanel>
+                                <Button.Flyout>
+                                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                        <MenuItem
+                                            x:Name="menuAddServerViaClipboard"
+                                            Header="{x:Static resx:ResUI.menuAddServerViaClipboard}"
+                                            InputGesture="Ctrl+V" />
+                                        <MenuItem
+                                            x:Name="menuAddServerViaScan"
+                                            Header="{x:Static resx:ResUI.menuAddServerViaScan}"
+                                            InputGesture="Ctrl+S" />
+                                        <MenuItem x:Name="menuAddServerViaImage" Header="{x:Static resx:ResUI.menuAddServerViaImage}" />
+                                        <Separator />
+                                        <MenuItem x:Name="menuAddCustomServer" Header="{x:Static resx:ResUI.menuAddCustomServer}" />
+                                        <MenuItem x:Name="menuAddPolicyGroupServer" Header="{x:Static resx:ResUI.menuAddPolicyGroupServer}" />
+                                        <MenuItem x:Name="menuAddProxyChainServer" Header="{x:Static resx:ResUI.menuAddProxyChainServer}" />
+                                        <MenuItem x:Name="menuAddCustomOutboundServer" Header="{x:Static resx:ResUI.menuAddCustomOutboundServer}" />
+                                        <Separator />
+                                        <MenuItem x:Name="menuAddVlessServer" Header="{x:Static resx:ResUI.menuAddVlessServer}" />
+                                        <MenuItem x:Name="menuAddVmessServer" Header="{x:Static resx:ResUI.menuAddVmessServer}" />
+                                        <MenuItem x:Name="menuAddShadowsocksServer" Header="{x:Static resx:ResUI.menuAddShadowsocksServer}" />
+                                        <MenuItem x:Name="menuAddTrojanServer" Header="{x:Static resx:ResUI.menuAddTrojanServer}" />
+                                        <MenuItem x:Name="menuAddHysteria2Server" Header="{x:Static resx:ResUI.menuAddHysteria2Server}" />
+                                        <MenuItem x:Name="menuAddWireguardServer" Header="{x:Static resx:ResUI.menuAddWireguardServer}" />
+                                        <MenuItem x:Name="menuAddMasqueServer" Header="{x:Static resx:ResUI.menuAddMasqueServer}" />
+                                        <MenuItem x:Name="menuAddSocksServer" Header="{x:Static resx:ResUI.menuAddSocksServer}" />
+                                        <MenuItem x:Name="menuAddHttpServer" Header="{x:Static resx:ResUI.menuAddHttpServer}" />
+                                        <Separator />
+                                        <MenuItem x:Name="menuAddTuicServer" Header="{x:Static resx:ResUI.menuAddTuicServer}" />
+                                        <MenuItem x:Name="menuAddAnytlsServer" Header="{x:Static resx:ResUI.menuAddAnytlsServer}" />
+                                        <MenuItem x:Name="menuAddNaiveServer" Header="{x:Static resx:ResUI.menuAddNaiveServer}" />
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+
+                            <!-- Subscriptions Action Button -->
+                            <Button x:Name="btnSubActions" Classes="SubtleAction">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Width="14" Height="14" Data="{StaticResource SemiIconRefresh}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuSubscription}" />
+                                </StackPanel>
+                                <Button.Flyout>
+                                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                        <MenuItem x:Name="menuSubSetting" Header="{x:Static resx:ResUI.menuSubSetting}" />
+                                        <Separator />
+                                        <MenuItem x:Name="menuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
+                                        <MenuItem x:Name="menuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
+                                        <MenuItem x:Name="menuSubGroupUpdate" Header="{x:Static resx:ResUI.menuSubGroupUpdate}" />
+                                        <MenuItem x:Name="menuSubGroupUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubGroupUpdateViaProxy}" />
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+
+                            <!-- Reload Core -->
+                            <Button
+                                x:Name="menuReload"
+                                Classes="SubtleAction"
+                                ToolTip.Tip="{x:Static resx:ResUI.menuReload}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Width="14" Height="14" Data="{StaticResource SemiIconBolt}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{x:Static resx:ResUI.menuReload}" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Advanced / Overflow Menu -->
+                            <Button
+                                x:Name="btnMoreMenu"
+                                Padding="9,7"
+                                Classes="SubtleAction"
+                                ToolTip.Tip="{x:Static resx:ResUI.menuSetting}">
+                                <PathIcon Width="16" Height="16" Data="{StaticResource IconMore}" />
+                                <Button.Flyout>
+                                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                        <MenuItem x:Name="menuOptionSetting" Header="{x:Static resx:ResUI.menuOptionSetting}" />
+                                        <MenuItem x:Name="menuRoutingSetting" Header="{x:Static resx:ResUI.menuRoutingSetting}" />
+                                        <MenuItem x:Name="menuDNSSetting" Header="{x:Static resx:ResUI.menuDNSSetting}" />
+                                        <MenuItem x:Name="menuFullConfigTemplate" Header="{x:Static resx:ResUI.menuFullConfigTemplate}" />
+                                        <MenuItem
+                                            x:Name="menuGlobalHotkeySetting"
+                                            Header="{x:Static resx:ResUI.menuGlobalHotkeySetting}"
+                                            IsVisible="{Binding BlIsWindows}" />
+                                        <Separator />
+                                        <MenuItem Header="{x:Static resx:ResUI.menuRegionalPresets}">
+                                            <MenuItem x:Name="menuRegionalPresetsDefault" Header="{x:Static resx:ResUI.menuRegionalPresetsDefault}" />
+                                            <MenuItem x:Name="menuRegionalPresetsRussia" Header="{x:Static resx:ResUI.menuRegionalPresetsRussia}" />
+                                            <MenuItem x:Name="menuRegionalPresetsIran" Header="{x:Static resx:ResUI.menuRegionalPresetsIran}" />
+                                        </MenuItem>
+                                        <MenuItem x:Name="menuBackupAndRestore" Header="{x:Static resx:ResUI.menuBackupAndRestore}" />
+                                        <MenuItem x:Name="menuClearServerStatistics" Header="{x:Static resx:ResUI.menuClearServerStatistics}" />
+                                        <MenuItem x:Name="menuOpenTheFileLocation" Header="{x:Static resx:ResUI.menuOpenTheFileLocation}" />
+                                        <Separator IsVisible="{Binding BlIsWindows}" />
+                                        <MenuItem
+                                            x:Name="menuRebootAsAdmin"
+                                            Header="{x:Static resx:ResUI.menuRebootAsAdmin}"
+                                            IsVisible="{Binding BlIsWindows}" />
+                                        <MenuItem
+                                            x:Name="menuSettingsSetUWP"
+                                            Header="{x:Static resx:ResUI.TbSettingsSetUWP}"
+                                            IsVisible="{Binding BlIsWindows}" />
+                                        <Separator />
+                                        <MenuItem x:Name="menuHelp" Header="{x:Static resx:ResUI.menuHelp}">
+                                            <MenuItem x:Name="menuCheckUpdate" Header="{x:Static resx:ResUI.menuCheckUpdate}" />
+                                            <MenuItem x:Name="menuAbout" Header="About Next N" />
+                                            <Separator />
+                                        </MenuItem>
+                                        <Separator />
+                                        <MenuItem x:Name="menuClose" Header="{x:Static resx:ResUI.menuExit}" />
+                                    </MenuFlyout>
+                                </Button.Flyout>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Left Page Title -->
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="10">
+                            <TextBlock
+                                x:Name="txtHeaderTitle"
+                                VerticalAlignment="Center"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource NextNTextPrimary}"
+                                Text="{x:Static resx:ResUI.menuServers}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- Bottom Control Dock -->
+                <ContentControl x:Name="contentStatusBarView" DockPanel.Dock="Bottom" />
+
+                <!-- Main Workspace Content -->
+                <Grid Margin="14,12,14,10">
+                    <!-- Horizontal Split Layout -->
+                    <Grid
+                        x:Name="gridMain"
+                        ColumnDefinitions="1*,10,1*"
+                        IsVisible="False">
+                        <ContentControl x:Name="tabProfiles" Grid.Column="0" />
+                        <GridSplitter
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            Background="Transparent" />
+                        <Border Grid.Column="2" Padding="6" Classes="SurfaceCard">
+                            <TabControl
+                                x:Name="tabMain"
+                                Classes="logPane"
+                                HorizontalContentAlignment="Left">
+                                <TabItem x:Name="tabMsgView" Header="{x:Static resx:ResUI.MsgInformationTitle}" />
+                                <TabItem x:Name="tabClashProxies" Header="{x:Static resx:ResUI.TbProxies}" />
+                                <TabItem x:Name="tabClashConnections" Header="{x:Static resx:ResUI.TbConnections}" />
+                            </TabControl>
+                        </Border>
+                    </Grid>
+
+                    <!-- Vertical Split Layout -->
+                    <Grid
+                        x:Name="gridMain1"
+                        IsVisible="False"
+                        RowDefinitions="1*,10,1*">
+                        <ContentControl x:Name="tabProfiles1" Grid.Row="0" />
+                        <GridSplitter
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            Background="Transparent" />
+                        <Border Grid.Row="2" Padding="6" Classes="SurfaceCard">
+                            <TabControl
+                                x:Name="tabMain1"
+                                Classes="logPane"
+                                TabStripPlacement="Top">
+                                <TabItem x:Name="tabMsgView1" Header="{x:Static resx:ResUI.MsgInformationTitle}" />
+                                <TabItem x:Name="tabClashProxies1" Header="{x:Static resx:ResUI.TbProxies}" />
+                                <TabItem x:Name="tabClashConnections1" Header="{x:Static resx:ResUI.TbConnections}" />
+                            </TabControl>
+                        </Border>
+                    </Grid>
+
+                    <!-- Unified Modern Sidebar-Driven Layout (Default) -->
+                    <Grid x:Name="gridMain2" IsVisible="False">
+                        <TabControl x:Name="tabMain2" Classes="sidebarDriven">
+                            <TabItem x:Name="tabProfiles2" Header="{x:Static resx:ResUI.menuServers}" />
+                            <TabItem x:Name="tabMsgView2" Header="{x:Static resx:ResUI.MsgInformationTitle}" />
+                            <TabItem x:Name="tabClashProxies2" Header="{x:Static resx:ResUI.TbProxies}" />
+                            <TabItem x:Name="tabClashConnections2" Header="{x:Static resx:ResUI.TbConnections}" />
+                        </TabControl>
+                    </Grid>
+                </Grid>
+            </DockPanel>
+        </Grid>
+    </dialogHost:DialogHost>
+</Window>
