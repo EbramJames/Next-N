@@ -11,7 +11,7 @@
     <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
     <PackageVersion Include="CliWrap" Version="3.10.5" />
     <PackageVersion Include="DialogHost.Avalonia" Version="0.12.3" />
-    <PackageVersion Include="Downloader" Version="5.9.8" />
+    <PackageVersion Include="Downloader" Version="7.1.0" />
     <PackageVersion Include="IPNetwork2" Version="4.3.0" />
     <PackageVersion Include="NLog" Version="6.2.1" />
     <PackageVersion Include="QRCoder" Version="1.8.0" />
