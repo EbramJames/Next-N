@@ -1,0 +1,36 @@
+name: Bug Report
+description: Report a bug or crash in Next N.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: "os-version"
+    attributes:
+      label: "Operating System / Next N Version / Core Version"
+      placeholder: "e.g., Windows 11 x64 / Next N v1.0.0 / Xray 25.x"
+    validations:
+      required: true
+
+  - type: textarea
+    id: "describe-the-bug"
+    attributes:
+      label: "What happened?"
+      description: "Describe the issue clearly."
+    validations:
+      required: true
+
+  - type: textarea
+    id: "reproduction"
+    attributes:
+      label: "Steps to reproduce"
+      placeholder: "1. Open Next N\n2. Click ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: "logs"
+    attributes:
+      label: "Application / Core Logs"
+      description: "Paste relevant lines from the Activity Log view or guiLogs folder."
+    validations:
+      required: false

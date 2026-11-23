@@ -1,0 +1,187 @@
+name: Release — All Platforms
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release version tag (e.g. v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  VERSION_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+
+jobs:
+  build-windows:
+    name: Windows Installer & Portable (${{ matrix.arch }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x64, arm64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue)) {
+            choco install nsis -y
+          }
+
+      - name: Build Windows Installer & Portable ZIP
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $ver = "${{ env.VERSION_TAG }}".TrimStart('v')
+          .\packaging\windows\build-windows.ps1 -Arch ${{ matrix.arch }} -Version $ver
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows-${{ matrix.arch }}
+          path: |
+            dist/NextN-Setup-${{ matrix.arch }}.exe
+            dist/NextN-windows-${{ matrix.arch }}-portable.zip
+
+  build-macos:
+    name: macOS DMG Installer (${{ matrix.arch }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ arm64, x64 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install packaging tools
+        run: brew install create-dmg jq
+
+      - name: Publish Next N (${{ matrix.arch }})
+        run: |
+          VER="${VERSION_TAG#v}"
+          dotnet publish src/NextN.Desktop/NextN.Desktop.csproj -c Release -r osx-${{ matrix.arch }} -p:SelfContained=true -p:PublishSingleFile=false -p:Version="$VER" -o publish/osx-${{ matrix.arch }}
+          dotnet publish src/NextN.Updater/NextN.Updater.csproj -c Release -r osx-${{ matrix.arch }} -p:SelfContained=true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:Version="$VER" -o publish/osx-${{ matrix.arch }}
+          find publish/osx-${{ matrix.arch }} -name '*.pdb' -delete
+
+      - name: Package macOS DMG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x packaging/macos/package-osx.sh
+          ./packaging/macos/package-osx.sh ${{ matrix.arch }} publish/osx-${{ matrix.arch }} "${VERSION_TAG#v}"
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-macos-${{ matrix.arch }}
+          path: dist/NextN-macos-*.dmg
+
+  build-linux:
+    name: Linux DEB & AppImage (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            rid: linux-x64
+            deb_arch: amd64
+            appimage_arch: x86_64
+          - arch: arm64
+            rid: linux-arm64
+            deb_arch: arm64
+            appimage_arch: aarch64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Linux packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip curl dpkg-dev desktop-file-utils xdg-utils rpm
+
+      - name: Publish Next N (${{ matrix.rid }})
+        run: |
+          VER="${VERSION_TAG#v}"
+          dotnet publish src/NextN.Desktop/NextN.Desktop.csproj -c Release -r ${{ matrix.rid }} -p:SelfContained=true -p:PublishSingleFile=false -p:Version="$VER" -o publish/${{ matrix.rid }}
+          dotnet publish src/NextN.Updater/NextN.Updater.csproj -c Release -r ${{ matrix.rid }} -p:SelfContained=true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:Version="$VER" -o publish/${{ matrix.rid }}
+          find publish/${{ matrix.rid }} -name '*.pdb' -delete
+
+      - name: Build Debian (.deb) package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x packaging/linux/package-debian.sh
+          ./packaging/linux/package-debian.sh ${{ matrix.deb_arch }} publish/${{ matrix.rid }} "${VERSION_TAG#v}"
+
+      - name: Build RPM (.rpm) package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x packaging/linux/package-rhel.sh
+          ./packaging/linux/package-rhel.sh ${{ matrix.appimage_arch }} publish/${{ matrix.rid }} "${VERSION_TAG#v}"
+
+      - name: Build Universal AppImage (x86_64)
+        if: matrix.arch == 'x64'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x packaging/linux/package-appimage.sh
+          ./packaging/linux/package-appimage.sh x86_64 publish/${{ matrix.rid }} "${VERSION_TAG#v}"
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux-${{ matrix.arch }}
+          path: |
+            dist/NextN-linux-*.deb
+            dist/NextN-linux-*.rpm
+            dist/NextN-linux-*.AppImage
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [ build-windows, build-macos, build-linux ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate SHA256SUMS.txt
+        working-directory: release-assets
+        run: sha256sum * > SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION_TAG }}
+          name: Next N ${{ env.VERSION_TAG }}
+          generate_release_notes: true
+          files: release-assets/*

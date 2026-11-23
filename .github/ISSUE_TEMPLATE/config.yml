@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Next N Repository & Documentation
+    url: https://github.com/EbramJames/Next-N
+    about: Browse setup instructions, installers, and architecture docs for Next N.
+  - name: Releases & Downloads
+    url: https://github.com/EbramJames/Next-N/releases
+    about: Download the latest Windows installer, macOS DMG, or Linux packages.
